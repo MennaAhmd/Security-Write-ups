@@ -49,7 +49,7 @@ The server rejected it outright:
 
 So `.php` is explicitly blacklisted. That's not a surprise it's the first extension anyone would think to block. The interesting question is what *else* the server would execute as PHP that the blacklist author didn't think to list.
 
-## Step 3: A Near Miss — `.pHp5`
+## Step 3: A Near Miss `.pHp5`
 
 Blacklists that key off a fixed extension string are usually easy to sidestep with case changes or alternate PHP extensions (`.php3`, `.php4`, `.php5`, `.phtml`, `.pht`…). I tried mixing both approaches at once and renamed the shell to `shell.pHp5`.
 
@@ -65,7 +65,7 @@ But accepted isn't the same as executed. Opening the uploaded file directly:
 
 The browser returned the **raw PHP source**, not its output. The `<?php ... ?>` code was displayed as plain text instead of running. This is a useful (and easy to miss) distinction: bypassing the filename filter only gets you a file on disk the server still has to be configured to hand that specific extension to the PHP interpreter, or all you've uploaded is a text file with a confusing name. In this case, `.pHp5` wasn't mapped to any handler Apache would execute, so it was served as static content.
 
-## Step 4: `.phar` — Accepted *and* Executed
+## Step 4: `.phar` Accepted *and* Executed
 
 Rather than trying to modify the server's configuration (the `.htaccess` route), I looked for an extension that PHP itself already treats as executable out of the box. `.phar` PHP's own archive format fit the bill, since many PHP/Apache setups map it to the PHP handler alongside `.php`.
 
