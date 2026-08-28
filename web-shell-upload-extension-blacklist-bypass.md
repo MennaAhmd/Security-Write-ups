@@ -23,11 +23,13 @@ There's more than one way to solve this lab. The "intended" PortSwigger solution
 
 After logging in as `wiener`, the account page exposes an avatar upload field.
 
-![alt text](image.png)
+<img width="1502" height="472" alt="image" src="https://github.com/user-attachments/assets/f80cf81c-26e1-47cc-8f89-4bb9d2a7b1b8" />
+
 
 Before trying to break anything, I wanted to understand how a normal upload behaves: where the file ends up, what the server checks, and how it's served back. The account page shows a file input under **Avatar**, tied to an **Upload** button that posts to `/my-account/avatar`.
 
-![alt text](image-1.png)
+<img width="1012" height="637" alt="image" src="https://github.com/user-attachments/assets/858aab8d-05aa-4386-b32b-22f42ad2e659" />
+
 
 ## Step 2: Confirming the Blacklist
 
@@ -42,7 +44,8 @@ echo file_get_contents('/home/carlos/secret');
 
 The server rejected it outright:
 
-![alt text](image-2.png)
+<img width="912" height="261" alt="image" src="https://github.com/user-attachments/assets/8d66238b-c646-4a2a-9ff3-0949643a9d26" />
+
 
 So `.php` is explicitly blacklisted. That's not a surprise it's the first extension anyone would think to block. The interesting question is what *else* the server would execute as PHP that the blacklist author didn't think to list.
 
@@ -50,13 +53,15 @@ So `.php` is explicitly blacklisted. That's not a surprise it's the first extens
 
 Blacklists that key off a fixed extension string are usually easy to sidestep with case changes or alternate PHP extensions (`.php3`, `.php4`, `.php5`, `.phtml`, `.pht`…). I tried mixing both approaches at once and renamed the shell to `shell.pHp5`.
 
-![alt text](image-3.png)
+<img width="1009" height="584" alt="image" src="https://github.com/user-attachments/assets/a17ac850-5ef6-49a3-9cdf-f1645ccdd95f" />
+
 
 This time the upload was accepted no rejection message, no error. The blacklist clearly wasn't matching this extension.
 
 But accepted isn't the same as executed. Opening the uploaded file directly:
 
-![alt text](image-4.png)
+<img width="926" height="279" alt="image" src="https://github.com/user-attachments/assets/40cf6b12-eaf5-470a-a01b-34efab7f1bea" />
+
 
 The browser returned the **raw PHP source**, not its output. The `<?php ... ?>` code was displayed as plain text instead of running. This is a useful (and easy to miss) distinction: bypassing the filename filter only gets you a file on disk the server still has to be configured to hand that specific extension to the PHP interpreter, or all you've uploaded is a text file with a confusing name. In this case, `.pHp5` wasn't mapped to any handler Apache would execute, so it was served as static content.
 
@@ -66,15 +71,19 @@ Rather than trying to modify the server's configuration (the `.htaccess` route),
 
 I renamed the same payload to `shell.phar` and uploaded it:
 
-![alt text](image-5.png)
+<img width="872" height="580" alt="image" src="https://github.com/user-attachments/assets/8a280657-184d-42b0-a9ab-a2f00cf0b7fb" />
+
+
 
 The server accepted it without complaint:
 
-![alt text](image-6.png)
+<img width="904" height="194" alt="image" src="https://github.com/user-attachments/assets/7ea744d3-37de-4449-82f9-a4dff46453c3" />
+
 
 This time, opening the file actually executed it:
 
-![alt text](image-7.png)
+<img width="904" height="194" alt="image" src="https://github.com/user-attachments/assets/c232ae11-a066-438d-8e99-5701f57675e6" />
+
 
 The response contained the contents of `/home/carlos/secret` instead of the source code confirmation that the PHP interpreter had run the file rather than just serving it.
 
@@ -82,9 +91,11 @@ The response contained the contents of `/home/carlos/secret` instead of the sour
 
 I copied the value returned by the shell and submitted it through the lab's solution dialog.
 
-![alt text](image-8.png)
+<img width="1470" height="461" alt="image" src="https://github.com/user-attachments/assets/e98f38cc-ee64-498a-9e13-9a5deffa6ab9" />
 
-![alt text](image-9.png)
+
+<img width="1575" height="935" alt="image" src="https://github.com/user-attachments/assets/e1133dfd-c570-4314-8503-24531d85620d" />
+
 
 **Lab solved.**
 
